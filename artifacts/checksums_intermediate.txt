@@ -1,0 +1,1 @@
+331f7d3424afd9ce5fe7a4bdc487e5a4ed1002d9a9bf8c2acb9137b135728781  ./target/wasm32-unknown-unknown/release/memo_contract.wasm

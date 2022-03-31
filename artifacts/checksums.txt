@@ -1,0 +1,1 @@
+2590c0e569e06c4fe29eec35b0d25a26b84f2d92bd4b25fb7c5f38f56cec2e5c  memo_contract.wasm
