@@ -1,0 +1,61 @@
+{
+  "_global": {
+    "_base": {
+      "store": {
+        "fee": {
+          "gasLimit": 1000,
+          "amount": {
+            "uusd": 0
+          }
+        }
+      },
+      "instantiation": {
+        "fee": {
+          "gasLimit": 200000,
+          "amount": {
+            "uusd": 20000
+          }
+        },
+        "instantiateMsg": {
+        }
+      }
+    },
+    "memo_transfer": {
+      "store": {
+        "fee": {
+          "gasLimit": 2500000,
+          "amount": {
+            "uusd": 375000
+          }
+        }
+      },
+      "instantiation": {
+        "fee": {
+          "gasLimit": 350000,
+          "amount": {
+            "uusd": 53000
+          }
+        },
+        "instantiateMsg": {
+          "wallet1": "terra1xn8afvjcxly4utmppwr6l5cp3vgzcj3yq3h0ml",
+          "wallet2": "terra1w6520gwwhawqvv489n0yfyh47t5sg6jq56xypt",
+          "wallet3": "terra1tqm5k62fhyfpgnzjhdm793p255qjmwgk8pcwek",
+          "wallet4": "terra1w8f99ahfmt0q9x85ms3ew70ug84xnw7tjj4xns",
+          "deduction_percentage": 5
+        }
+      }
+    }
+  },
+  "testnet": {
+    "_connection": {
+      "chainID": "bombay-12",
+      "URL": "https://bombay-lcd.terra.dev"
+    }
+  },
+  "localterra": {
+    "_connection": {
+      "chainID": "localterra",
+      "URL": "http://localhost:3060"
+    }
+  }
+}

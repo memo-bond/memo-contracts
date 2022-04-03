@@ -3,15 +3,36 @@
   "title": "State",
   "type": "object",
   "required": [
-    "count",
-    "owner"
+    "deduction_percentage",
+    "initializer",
+    "is_disable",
+    "wallet1",
+    "wallet2",
+    "wallet3",
+    "wallet4"
   ],
   "properties": {
-    "count": {
+    "deduction_percentage": {
       "type": "integer",
-      "format": "int32"
+      "format": "uint16",
+      "minimum": 0.0
     },
-    "owner": {
+    "initializer": {
+      "$ref": "#/definitions/Addr"
+    },
+    "is_disable": {
+      "type": "boolean"
+    },
+    "wallet1": {
+      "$ref": "#/definitions/Addr"
+    },
+    "wallet2": {
+      "$ref": "#/definitions/Addr"
+    },
+    "wallet3": {
+      "$ref": "#/definitions/Addr"
+    },
+    "wallet4": {
       "$ref": "#/definitions/Addr"
     }
   },

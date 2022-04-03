@@ -1,14 +1,15 @@
-build:
-	@cargo wasm
+net-work ?= testnet
 
-build-optimize:
-	@cargo run-script optimize
+console:
+	@terrain console
 
-generate-schema:
-	@cargo schema
+new-contract:
+	@terrain code:new $(contract-name)
 
-upload:
-	@make build-optimize
-	@terrad tx wasm store artifacts/memo_contract.wasm --from test1 --chain-id=localterra --gas=auto --fees=100000uluna --broadcast-mode=block
+store-code:
+	@terrain code:store $(contract-name) --signer test_account --network $(net-work)
 
-.PHONY: build build-optimize
+init:
+	@terrain contract:instantiate $(contract-name) --signer test_account --network $(net-work)
+
+.PHONY: store-code new-contract init

@@ -9,6 +9,10 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./contracts/memo_transfer
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -25,7 +29,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: unit-test
-          # args: --locked
+          args: --locked
         env:
           RUST_BACKTRACE: 1
 
@@ -33,7 +37,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: wasm
-          # args: --locked
+          args: --locked
         env:
           RUSTFLAGS: "-C link-arg=-s"
 
@@ -71,4 +75,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: schema
-          # args: --locked
+          args: --locked

@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "ExecuteMsg",
-  "anyOf": [
+  "title": "QueryMsg",
+  "oneOf": [
     {
       "type": "object",
       "required": [
-        "increment"
+        "get_contract_state"
       ],
       "properties": {
-        "increment": {
+        "get_contract_state": {
           "type": "object"
         }
       },
@@ -17,18 +17,17 @@
     {
       "type": "object",
       "required": [
-        "reset"
+        "get_balance"
       ],
       "properties": {
-        "reset": {
+        "get_balance": {
           "type": "object",
           "required": [
-            "count"
+            "address"
           ],
           "properties": {
-            "count": {
-              "type": "integer",
-              "format": "int32"
+            "address": {
+              "type": "string"
             }
           }
         }
