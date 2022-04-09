@@ -1,10 +1,13 @@
 net-work ?= testnet
 
 console:
-	@terrain console
+	@terrain console --network $(net-work)
 
 new-contract:
 	@terrain code:new $(contract-name)
+
+deploy:
+	@terrain deploy $(contract-name) --signer test_account --network $(net-work)
 
 store-code:
 	@terrain code:store $(contract-name) --signer test_account --network $(net-work)

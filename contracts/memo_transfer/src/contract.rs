@@ -1,14 +1,11 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{
-    coins, to_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult,
-    Uint128,
-};
+use cosmwasm_std::{coins, to_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint128, StdError};
 use cw2::set_contract_version;
 use std::ops::Add;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, TransferBankMsg};
+use crate::msg::{CustomMsg, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{State, STATE};
 
 // version info for migration info
@@ -27,7 +24,7 @@ pub fn instantiate(
     let wallet3_addr = deps.api.addr_validate(&msg.wallet3)?;
     let wallet4_addr = deps.api.addr_validate(&msg.wallet4)?;
 
-    if msg.deduction_percentage >= 100 {
+    if msg.deduction_percentage.gt(&Uint128::from(100_u128)) {
         return Err(ContractError::DeductionPercentageExceed {});
     }
 
@@ -61,7 +58,7 @@ pub fn execute(
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
-) -> Result<Response, ContractError> {
+) -> Result<Response<CustomMsg>, ContractError> {
     let state = STATE.load(deps.storage)?;
     if state.is_disable {
         return Err(ContractError::Disabled {});
@@ -84,7 +81,7 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     }
 }
 
-pub fn try_disable(deps: DepsMut) -> Result<Response, ContractError> {
+pub fn try_disable(deps: DepsMut) -> Result<Response<CustomMsg>, ContractError> {
     STATE.update(deps.storage, |mut s| -> StdResult<_> {
         s.is_disable = true;
         Ok(s)
@@ -101,19 +98,35 @@ pub fn try_transfer(
     recipient: String,
     amount: Uint128,
     denom: String,
-) -> Result<Response, ContractError> {
+) -> Result<Response<CustomMsg>, ContractError> {
     let state = STATE.load(deps.storage)?;
+    // println!("amount: {:?}", amount);
 
-    let recipient_amount = amount
-        .checked_mul(Uint128::new((100 - state.deduction_percentage) as u128))
-        .unwrap();
-    let deduction_amount = amount - recipient_amount;
-    let member_deduction_amount = deduction_amount.checked_div(Uint128::new(4_u128)).unwrap();
+    let recipient_percent = Uint128::from(100_u128)
+        .checked_sub(state.deduction_percentage)
+        .map_err(StdError::overflow)?;
+
+    let recipient_amount =
+        amount.checked_mul(recipient_percent)
+              .map_err(StdError::overflow)?
+            .checked_div(Uint128::from(100_u128))
+            .map_err(StdError::divide_by_zero)?;
+
+    let deduction_amount = amount
+        .checked_sub(recipient_amount)
+        .map_err(StdError::overflow)?;
+
+    let member_deduction_amount = deduction_amount.checked_div(Uint128::from(4_u128))
+                                                  .map_err(StdError::divide_by_zero)?;
+
+    // println!("recipient amount: {:?}", recipient_amount);
+    // println!("deduction: {:?}", deduction_amount);
+    // println!("member amount: {:?}", member_deduction_amount);
     let sender_addr: String = info.sender.into_string();
-    let mut messages: Vec<CosmosMsg<TransferBankMsg>> = vec![];
+    let mut messages: Vec<CosmosMsg<CustomMsg>> = vec![];
 
     messages.push(
-        TransferBankMsg {
+        CustomMsg::Transfer {
             from_address: sender_addr.clone(),
             to_address: recipient.clone(),
             amount: coins(recipient_amount.u128(), denom.clone()),
@@ -122,7 +135,7 @@ pub fn try_transfer(
     );
 
     messages.push(
-        TransferBankMsg {
+        CustomMsg::Transfer {
             from_address: sender_addr.clone(),
             to_address: state.wallet1.into_string(),
             amount: coins(member_deduction_amount.u128(), denom.clone()),
@@ -131,7 +144,7 @@ pub fn try_transfer(
     );
 
     messages.push(
-        TransferBankMsg {
+        CustomMsg::Transfer {
             from_address: sender_addr.clone(),
             to_address: state.wallet2.into_string(),
             amount: coins(member_deduction_amount.u128(), denom.clone()),
@@ -140,7 +153,7 @@ pub fn try_transfer(
     );
 
     messages.push(
-        TransferBankMsg {
+        CustomMsg::Transfer {
             from_address: sender_addr.clone(),
             to_address: state.wallet3.into_string(),
             amount: coins(member_deduction_amount.u128(), denom.clone()),
@@ -149,7 +162,7 @@ pub fn try_transfer(
     );
 
     messages.push(
-        TransferBankMsg {
+        CustomMsg::Transfer {
             from_address: sender_addr.clone(),
             to_address: state.wallet4.into_string(),
             amount: coins(member_deduction_amount.u128(), denom.clone()),
@@ -158,15 +171,21 @@ pub fn try_transfer(
     );
 
     Ok(Response::new()
-        // .add_messages(messages)
-        .add_attribute("method", "try_transfer")
-        .add_attribute(
-            "deductionPercentage",
-            state.deduction_percentage.to_string().add("%"),
-        )
-        .add_attribute("transfer.denom", denom)
-        .add_attribute("transfer.sender", sender_addr)
-        .add_attribute("transfer.recipient", recipient)
-        .add_attribute("transfer.amount", amount.to_string())
-        .add_attribute("transfer.block_time", env.block.time.seconds().to_string()))
+           // .add_messages(messages)
+           .add_attribute("method", "try_transfer")
+           .add_attribute(
+               "deductionPercentage",
+               state.deduction_percentage.to_string().add("%"),
+           )
+           .add_attribute("transfer.recipient.percent", recipient_percent.to_string())
+           .add_attribute("transfer.recipient.amount", recipient_amount.to_string())
+           .add_attribute("transfer.deduction.amount", deduction_amount.to_string())
+       .add_attribute("transfer.recipient.member_deduction_amount", member_deduction_amount.to_string())
+       .add_attribute("transfer.denom", denom)
+       .add_attribute("transfer.sender", sender_addr)
+       .add_attribute("transfer.recipient", recipient)
+       .add_attribute("transfer.amount", amount.to_string())
+       .add_attribute("transfer.block_time", env.block.time.seconds().to_string())
+    )
+
 }

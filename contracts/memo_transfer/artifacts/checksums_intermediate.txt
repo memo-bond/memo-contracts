@@ -1,1 +1,1 @@
-5b15756450a8472cf800a35e8ee34557b20d2d937344da30a499b6206b491f7f  ./target/wasm32-unknown-unknown/release/memo_transfer.wasm
+4aac950d57361058280e87f3592f8ebc9e9f5e97b6130bd638be70e22fb510bf  ./target/wasm32-unknown-unknown/release/memo_transfer.wasm
