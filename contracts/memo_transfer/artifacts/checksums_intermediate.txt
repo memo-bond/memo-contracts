@@ -1,1 +1,0 @@
-4aac950d57361058280e87f3592f8ebc9e9f5e97b6130bd638be70e22fb510bf  ./target/wasm32-unknown-unknown/release/memo_transfer.wasm

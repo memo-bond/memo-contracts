@@ -1,6 +1,6 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{coins, to_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint128, StdError};
+use cosmwasm_std::{coins, to_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint128, StdError, SubMsg, BankMsg, ReplyOn};
 use cw2::set_contract_version;
 use std::ops::Add;
 
@@ -123,55 +123,66 @@ pub fn try_transfer(
     // println!("deduction: {:?}", deduction_amount);
     // println!("member amount: {:?}", member_deduction_amount);
     let sender_addr: String = info.sender.into_string();
-    let mut messages: Vec<CosmosMsg<CustomMsg>> = vec![];
 
-    messages.push(
-        CustomMsg::Transfer {
-            from_address: sender_addr.clone(),
-            to_address: recipient.clone(),
-            amount: coins(recipient_amount.u128(), denom.clone()),
+    let message = vec![
+        SubMsg {
+            id: 12,
+            msg: BankMsg::Send { to_address: recipient.clone(), amount: coins(recipient_amount.u128(), denom.clone()) }.into(),
+            gas_limit: Some(12345u64),
+            reply_on: ReplyOn::Always,
         }
-        .into(),
-    );
+    ];
+    
+    // let mut messages: Vec<CosmosMsg<CustomMsg>> = vec![];
 
-    messages.push(
-        CustomMsg::Transfer {
-            from_address: sender_addr.clone(),
-            to_address: state.wallet1.into_string(),
-            amount: coins(member_deduction_amount.u128(), denom.clone()),
-        }
-        .into(),
-    );
+    // messages.push(
+    //     CustomMsg::Transfer {
+    //         from_address: sender_addr.clone(),
+    //         to_address: recipient.clone(),
+    //         amount: coins(recipient_amount.u128(), denom.clone()),
+    //     }
+    //     .into(),
+    // );
 
-    messages.push(
-        CustomMsg::Transfer {
-            from_address: sender_addr.clone(),
-            to_address: state.wallet2.into_string(),
-            amount: coins(member_deduction_amount.u128(), denom.clone()),
-        }
-        .into(),
-    );
+    // messages.push(
+    //     CustomMsg::Transfer {
+    //         from_address: sender_addr.clone(),
+    //         to_address: state.wallet1.into_string(),
+    //         amount: coins(member_deduction_amount.u128(), denom.clone()),
+    //     }
+    //     .into(),
+    // );
 
-    messages.push(
-        CustomMsg::Transfer {
-            from_address: sender_addr.clone(),
-            to_address: state.wallet3.into_string(),
-            amount: coins(member_deduction_amount.u128(), denom.clone()),
-        }
-        .into(),
-    );
+    // messages.push(
+    //     CustomMsg::Transfer {
+    //         from_address: sender_addr.clone(),
+    //         to_address: state.wallet2.into_string(),
+    //         amount: coins(member_deduction_amount.u128(), denom.clone()),
+    //     }
+    //     .into(),
+    // );
 
-    messages.push(
-        CustomMsg::Transfer {
-            from_address: sender_addr.clone(),
-            to_address: state.wallet4.into_string(),
-            amount: coins(member_deduction_amount.u128(), denom.clone()),
-        }
-        .into(),
-    );
+    // messages.push(
+    //     CustomMsg::Transfer {
+    //         from_address: sender_addr.clone(),
+    //         to_address: state.wallet3.into_string(),
+    //         amount: coins(member_deduction_amount.u128(), denom.clone()),
+    //     }
+    //     .into(),
+    // );
+
+    // messages.push(
+    //     CustomMsg::Transfer {
+    //         from_address: sender_addr.clone(),
+    //         to_address: state.wallet4.into_string(),
+    //         amount: coins(member_deduction_amount.u128(), denom.clone()),
+    //     }
+    //     .into(),
+    // );
 
     Ok(Response::new()
            // .add_messages(messages)
+           .add_submessages(message)
            .add_attribute("method", "try_transfer")
            .add_attribute(
                "deductionPercentage",

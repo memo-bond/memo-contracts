@@ -1,9 +1,9 @@
 {
   "testnet": {
     "memo_transfer": {
-      "codeId": "61663",
+      "codeId": "61964",
       "contractAddresses": {
-        "default": "terra1mn7fe5tnrgrjmtl0dnxps3ryak2dje4whpad0z"
+        "default": "terra1kzj8h5dtqdfduu6fqcank24vvmcfktt99k297p"
       }
     }
   }
