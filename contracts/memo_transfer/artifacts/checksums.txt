@@ -1,0 +1,1 @@
+b6bcec293cb2619c56ebee5c0b44f162c4a0bf3ef61d1f64eb1c577c19d93004  memo_transfer.wasm

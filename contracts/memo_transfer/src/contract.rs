@@ -3,6 +3,7 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{coins, to_binary, Binary, CosmosMsg, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint128, StdError, SubMsg, BankMsg, ReplyOn};
 use cw2::set_contract_version;
 use std::ops::Add;
+use cw20_base::contract::execute_transfer;
 
 use crate::error::ContractError;
 use crate::msg::{CustomMsg, ExecuteMsg, InstantiateMsg, QueryMsg};
@@ -125,14 +126,9 @@ pub fn try_transfer(
     let sender_addr: String = info.sender.into_string();
 
     let message = vec![
-        SubMsg {
-            id: 12,
-            msg: BankMsg::Send { to_address: recipient.clone(), amount: coins(recipient_amount.u128(), denom.clone()) }.into(),
-            gas_limit: Some(12345u64),
-            reply_on: ReplyOn::Always,
-        }
+        CosmosMsg::Bank(BankMsg::Send { to_address: recipient.clone(), amount: coins(recipient_amount.u128(), denom.clone()) })
     ];
-    
+
     // let mut messages: Vec<CosmosMsg<CustomMsg>> = vec![];
 
     // messages.push(
@@ -181,8 +177,8 @@ pub fn try_transfer(
     // );
 
     Ok(Response::new()
-           // .add_messages(messages)
-           .add_submessages(message)
+           .add_messages(message)
+           // .add_submessages(message)
            .add_attribute("method", "try_transfer")
            .add_attribute(
                "deductionPercentage",
