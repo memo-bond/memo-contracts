@@ -1,4 +1,4 @@
-use cosmwasm_std::{Coin, CosmosMsg};
+use cosmwasm_std::{Coin, CosmosMsg, Uint128};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -8,7 +8,7 @@ pub struct InstantiateMsg {
     pub wallet2: String,
     pub wallet3: String,
     pub wallet4: String,
-    pub deduction_percentage: u16,
+    pub deduction_percentage: Uint128,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -30,20 +30,16 @@ pub enum QueryMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub struct TransferBankMsg {
-    pub from_address: String,
-    pub to_address: String,
-    pub amount: Vec<Coin>,
-}
-
-impl From<TransferBankMsg> for CosmosMsg<TransferBankMsg> {
-    fn from(original: TransferBankMsg) -> Self {
-        CosmosMsg::Custom(original)
+pub enum CustomMsg {
+    Transfer {
+        from_address: String,
+        to_address: String,
+        amount: Vec<Coin>
     }
 }
 
-// impl Into<CosmosMsg<TransferBankMsg>> for TransferBankMsg {
-//     fn into(self) -> CosmosMsg<TransferBankMsg> {
-//         CosmosMsg::Custom(self)
-//     }
-// }
+impl Into<CosmosMsg<CustomMsg>> for CustomMsg {
+    fn into(self) -> CosmosMsg<CustomMsg> {
+        CosmosMsg::Custom(self)
+    }
+}

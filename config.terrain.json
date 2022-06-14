@@ -41,7 +41,7 @@
           "wallet2": "terra1w6520gwwhawqvv489n0yfyh47t5sg6jq56xypt",
           "wallet3": "terra1tqm5k62fhyfpgnzjhdm793p255qjmwgk8pcwek",
           "wallet4": "terra1w8f99ahfmt0q9x85ms3ew70ug84xnw7tjj4xns",
-          "deduction_percentage": 5
+          "deduction_percentage": "5"
         }
       }
     }
